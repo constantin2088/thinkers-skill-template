@@ -1,3 +1,11 @@
+<!-- SERIES:START -->
+> **属于 [Chinese Thinkers as Skills 系列](https://github.com/constantin2088/chinese-thinkers-skills)** · [完整作品目录](https://github.com/constantin2088/chinese-thinkers-skills#作品目录)
+
+**相关推荐**：[梁启超·自新与变局](https://github.com/constantin2088/liang-qichao-skill) · [叶茂中·冲突营销](https://github.com/constantin2088/ye-maozhong-skill)
+
+> 系列入口与推荐由总仓库 catalog/skills.json 生成。
+<!-- SERIES:END -->
+
 # Thinkers Skill Template / 中国思想家 Agent Skill 开发模板
 
 **A small, dependency-free starter for research-grounded Agent Skills.**
@@ -56,3 +64,8 @@ python -m unittest discover -s tests -v
 ## License
 
 MIT License · Maintainer: [constantin2088](https://github.com/constantin2088)
+## 系列关联自动继承
+
+新人物会自动带上系列标识、总仓库回链、已发布作品推荐与每日 README 刷新工作流。模板快照由总仓库发布脚本生成；请勿手改作品列表。
+
+发布后运行 `python scripts/sync_series.py --slug <仓库名>` 刷新 README，运行 `python scripts/sync_series.py --slug <仓库名> --metadata --apply` 同步 GitHub About。统一 Topics、Website 与推荐来自 [唯一目录](https://github.com/constantin2088/chinese-thinkers-skills/blob/main/catalog/skills.json)。About 操作需要已有管理登录；普通 CI 只写本仓库 README。

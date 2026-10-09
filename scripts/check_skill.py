@@ -22,6 +22,13 @@ def check(root,release=False):
         p=root/rel
         if not p.exists():problems.append('missing '+rel)
         elif release and ('TODO' in p.read_text(encoding='utf-8') or 'DRAFT' in p.read_text(encoding='utf-8')):problems.append('unfinished '+rel)
+    if release:
+        for file in root.rglob('*.md'):
+            if '.git' not in file.parts and re.search(r'\b(?:TODO|DRAFT)\b', file.read_text(encoding='utf-8')):
+                problems.append('unfinished '+str(file.relative_to(root)))
+        if skill.exists():
+            name=re.search(r'^name:\s*(\S+)',skill.read_text(encoding='utf-8'),re.M)
+            if not name or name.group(1)!=root.resolve().name:problems.append('skill name must match directory')
     return problems
 
 if __name__=='__main__':

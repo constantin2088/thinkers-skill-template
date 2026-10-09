@@ -35,6 +35,10 @@ def create(slug,person,focus,output):
         data=src.read_text(encoding='utf-8')
         for key,value in variables.items():data=data.replace(key,value)
         dst.write_text(data,encoding='utf-8')
+    import json
+    from sync_series import sync_readme
+    catalog = json.loads((target/'series-catalog.json').read_text(encoding='utf-8'))
+    sync_readme(target, catalog, slug)
     return target
 
 def main():

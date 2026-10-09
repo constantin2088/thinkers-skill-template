@@ -28,3 +28,13 @@ class ScaffoldTests(unittest.TestCase):
 
 if __name__=='__main__':
     unittest.main()
+
+class SeriesScaffoldTests(unittest.TestCase):
+    def test_new_person_has_series_and_refresh_workflow(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p=create('new-thinker','新人物','研究',tmp)
+            text=(p/'README.md').read_text(encoding='utf-8')
+            self.assertIn('Chinese Thinkers as Skills',text)
+            self.assertIn('liang-qichao-skill',text)
+            self.assertTrue((p/'scripts/sync_series.py').exists())
+            self.assertTrue((p/'.github/workflows/series-links.yml').exists())
