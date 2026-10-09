@@ -38,3 +38,10 @@ class SeriesScaffoldTests(unittest.TestCase):
             self.assertIn('liang-qichao-skill',text)
             self.assertTrue((p/'scripts/sync_series.py').exists())
             self.assertTrue((p/'.github/workflows/series-links.yml').exists())
+    def test_release_rejects_unfinished_secondary_example(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p=create('new-thinker','新人物','研究',tmp)
+            for file in p.rglob('*.md'):
+                file.write_text(file.read_text(encoding='utf-8').replace('TODO','Complete').replace('DRAFT','Ready'),encoding='utf-8')
+            (p/'examples/unfinished.md').write_text('TODO: research this claim',encoding='utf-8')
+            self.assertIn('unfinished examples/unfinished.md',check(p,release=True))
