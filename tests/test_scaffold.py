@@ -25,6 +25,16 @@ class ScaffoldTests(unittest.TestCase):
             create('test-thinker','测试人物','研究',tmp)
             with self.assertRaises(FileExistsError):
                 create('test-thinker','测试人物','研究',tmp)
+    def test_generated_evaluation_plan_meets_case_gate_but_remains_pending(self):
+        import re
+        with tempfile.TemporaryDirectory() as tmp:
+            p=create('new-thinker','新人物','研究',tmp)
+            evaluation=(p/'evals/test-cases.md').read_text(encoding='utf-8')
+            headings=re.findall(r'^## Case \d+.*$',evaluation,re.M)
+            self.assertGreaterEqual(len(headings),10)
+            self.assertGreaterEqual(sum('negative' in h or 'adversarial' in h for h in headings),3)
+            self.assertIn('all cases are pending',evaluation)
+            self.assertTrue(check(p,release=True),'Generating a plan must not silently publish a finished Skill')
 
 if __name__=='__main__':
     unittest.main()
