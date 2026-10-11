@@ -20,10 +20,20 @@ def clean_one_line(value, label):
         raise ValueError(f'{label} must be one line without control characters or template markers')
     return value.strip()
 
-def create(slug,person,focus,output):
+def create(slug,person,focus,output,discovery_path=None):
     validate_slug(slug)
     person=clean_one_line(person, 'name')
     focus=clean_one_line(focus, 'focus')
+    import json
+    catalog=json.loads((TEMPLATES/'series-catalog.json.tmpl').read_text(encoding='utf-8'))
+    if discovery_path:
+        if discovery_path not in {p['id'] for p in catalog.get('discovery_paths',[])}:
+            raise ValueError('Unknown discovery path; choose a path from the catalog snapshot')
+        if any(s['id']==slug for s in catalog['skills']):
+            raise ValueError('Skill ID already exists in the series; use its existing repository')
+        # Local draft metadata enables relevant recommendations without publishing.
+        catalog['skills'].append(dict(id=slug,name_zh=person,name_en=person,focus=focus,
+            focus_en=focus,status='planned',discovery_path=discovery_path))
     target = Path(output).expanduser().resolve() / slug
     if target.exists():
         raise FileExistsError(f'Output already exists (will not overwrite): {target}')
@@ -37,7 +47,7 @@ def create(slug,person,focus,output):
         dst.write_text(data,encoding='utf-8')
     import json
     from sync_series import sync_readme
-    catalog = json.loads((target/'series-catalog.json').read_text(encoding='utf-8'))
+    if discovery_path:(target/'series-catalog.json').write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     sync_readme(target, catalog, slug)
     return target
 
@@ -47,9 +57,10 @@ def main():
     p.add_argument('--name-zh',required=True)
     p.add_argument('--focus',required=True)
     p.add_argument('--output',default='./dist')
+    p.add_argument('--path',dest='discovery_path',help='Optional task path from the catalog snapshot')
     a=p.parse_args()
     try:
-        target=create(a.slug,a.name_zh,a.focus,a.output)
+        target=create(a.slug,a.name_zh,a.focus,a.output,a.discovery_path)
     except (ValueError,FileExistsError) as exc:
         p.error(str(exc))
     print(f'Created draft: {target}')
